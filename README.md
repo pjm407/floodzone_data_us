@@ -1,7 +1,6 @@
-# R Code - Wrangle Floodzone Data
+## R Code - Wrangling Floodzone Data from NYU Furman Center
 
-## Source: NYU Furman Center 
-### Link: http://floodzonedata.us/
+### Source: http://floodzonedata.us/
 
 Furman provides housing and floodplain data sourced from the National Housing Preservation Database, U.S. Census Bureau, and the  National Flood Hazard Layer data from the U.S. Federal Emergency Management Agency (FEMA). Methodology can be found here: https://furmancenter.org/floodzonedata/data/methodology
 
