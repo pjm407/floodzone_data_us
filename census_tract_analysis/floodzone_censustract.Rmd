@@ -1,0 +1,270 @@
+---
+title: "Untitled"
+author: "Mattingly"
+date: "9/9/2020"
+output: pdf_document
+---
+
+```{r}
+install.packages("tidyverse","readxl")
+library(tidyverse)
+library(readxl)
+```
+
+```{r}
+# Import NY Floodzone Data
+ny_floodzone <- read_excel("~/Desktop/Thesis Analysis/Data/NY_FloodzoneData.xlsx", sheet = "Census Tract Data") 
+# Identify "500-Year" and "Combined" Floodplains
+ny_floodzone <- ny_floodzone %>%
+  rename_all(. %>% tolower %>% gsub(" ", "_", .)) %>%
+  mutate(floodplain = case_when(pop_100year == 0 & pop_anyyear > 0 ~ "500-Year",
+                                pop_100year > 0 & pop_anyyear > 0 ~ "Combined"))
+ny_floodzone %>% count(floodplain)
+```
+
+**Population**
+
+```{r}
+pop_vars <- c("geo_type","geo_name","geo_id","stateusps","floodplain",
+                "pop_tot","pop_100year","pop_anyyear")
+
+ny_floodzone_pop <- ny_floodzone %>% 
+  select(pop_vars) %>%
+  gather(subject, population, pop_tot:pop_anyyear) %>%
+  separate(subject, c("variable", "universe")) %>%
+  select(-variable) %>%
+  mutate(universe = replace(universe, universe == "tot", "Total"),
+         universe = replace(universe, universe == "100year", "100-Year"),
+         universe = replace(universe, universe == "anyyear", "Combined")) %>%
+  filter(population != 0)
+
+head(ny_floodzone_pop)
+```
+
+**Housing**
+
+```{r}
+housing_vars <- c("geo_type","geo_name","geo_id","stateusps","floodplain",
+                "hu_100year","hu_anyyear","hu_tot")
+
+ny_floodzone_housing <- ny_floodzone %>% 
+  select(housing_vars) %>%
+  rename_all(funs(stringr::str_replace_all(., c("hu_"), ""))) %>%
+  gather(universe, housing_total, "100year":tot) %>%
+  mutate(universe = replace(universe, universe == "tot", "Total"),
+         universe = replace(universe, universe == "100year", "100-Year"),
+         universe = replace(universe, universe == "anyyear", "Combined")) %>%
+  filter(housing_total != 0)
+
+head(ny_floodzone_housing)
+```
+
+**Race**
+
+```{r}
+
+race_vars <- c("geo_type","geo_name","geo_id","stateusps","floodplain",
+               "shr_pop_asian_fp_100","shr_pop_asian_fp_any",
+               "shr_pop_asian_tract","shr_pop_black_fp_100","shr_pop_black_fp_any","shr_pop_black_tract",
+               "shr_pop_hispanic_fp_100","shr_pop_hispanic_fp_any","shr_pop_hispanic_tract","shr_pop_white_fp_100",
+               "shr_pop_white_fp_any","shr_pop_white_tract")
+
+ny_floodzone_race <- ny_floodzone %>% 
+  select(race_vars) %>%
+  rename_all(funs(stringr::str_replace_all(., c("shr_pop_"), ""))) %>%
+  rename_all(funs(stringr::str_replace_all(., c("_fp"), ""))) %>%
+  gather(subject, race_share, asian_100:white_tract) %>%
+  separate(subject, c("race", "universe")) %>%
+  mutate(race = str_to_title(race),
+         universe = replace(universe, universe == "tract", "Total"),
+         universe = replace(universe, universe == "100", "100-Year"),
+         universe = replace(universe, universe == "any", "Combined")) %>%
+  filter(race_share != "NA")
+
+head(ny_floodzone_race)
+```
+
+**Income**
+
+```{r}
+
+income_vars <- c("geo_type","geo_name","geo_id","stateusps","floodplain",
+                 "shr_hu_incless25_fp_100","shr_hu_incless25_fp_any","shr_hu_incless25_tract","shr_hu_inc25to50_fp_100",
+                 "shr_hu_inc25to50_fp_any","shr_hu_inc25to50_tract","shr_hu_inc50to75_fp_100","shr_hu_inc50to75_fp_any",
+                 "shr_hu_inc50to75_tract","shr_hu_inc75up_fp_100","shr_hu_inc75up_fp_any","shr_hu_inc75up_tract")
+
+ny_floodzone_income <- ny_floodzone %>% 
+  select(income_vars) %>%
+  rename_all(funs(stringr::str_replace_all(., c("shr_hu_"), ""))) %>%
+  rename_all(funs(stringr::str_replace_all(., c("_fp"), ""))) %>%
+  gather(subject, income_share, incless25_100:inc75up_tract) %>%
+  separate(subject, c("income", "universe")) %>%
+  mutate(income = replace(income, income == "incless25", "<$25k"),
+         income = replace(income, income == "inc25to50", "$25k-$49,999"),
+         income = replace(income, income == "inc50to75", "$50k-$74,999"),
+         income = replace(income, income == "inc75up", "$75k+"),
+         universe = replace(universe, universe == "tract", "Total"),
+         universe = replace(universe, universe == "100", "100-Year"),
+         universe = replace(universe, universe == "any", "Combined")) %>%
+  filter(income_share != "NA")
+
+head(ny_floodzone_income)
+```
+
+**Housing Tenure**
+
+```{r}
+
+tenure_vars <- c("geo_type","geo_name","geo_id","stateusps","floodplain",
+                 "shr_hu_renter_fp_100","shr_hu_renter_fp_any","shr_hu_renter_tract","shr_hu_owner_fp_100",
+                 "shr_hu_owner_fp_any","shr_hu_owner_tract")
+
+ny_floodzone_tenure <- ny_floodzone %>% 
+  select(tenure_vars) %>%
+  rename_all(funs(stringr::str_replace_all(., c("shr_hu_"), ""))) %>%
+  rename_all(funs(stringr::str_replace_all(., c("_fp"), ""))) %>%
+  gather(subject, tenure_share, renter_100:owner_tract) %>%
+  separate(subject, c("tenure", "universe")) %>%
+  mutate(tenure = str_to_title(tenure),
+         universe = replace(universe, universe == "tract", "Total"),
+         universe = replace(universe, universe == "100", "100-Year"),
+         universe = replace(universe, universe == "any", "Combined")) %>%
+  filter(tenure_share != "NA")
+
+head(ny_floodzone_tenure)
+```
+
+**Building Type**
+
+```{r}
+
+unit_vars <- c("geo_type","geo_name","geo_id","stateusps","floodplain",
+                 "shr_hu_1fam_fp_100","shr_hu_1fam_fp_any","shr_hu_1fam_tract","shr_hu_2to4fam_fp_100",
+                 "shr_hu_2to4fam_fp_any","shr_hu_2to4fam_tract","shr_hu_5to19fam_fp_100","shr_hu_5to19fam_fp_any",
+                 "shr_hu_5to19fam_tract","shr_hu_20up_fp_100","shr_hu_20up_fp_any","shr_hu_20up_tract",
+                 "shr_hu_other_fp_100","shr_hu_other_fp_any","shr_hu_other_tract")
+
+ny_floodzone_unit <- ny_floodzone %>% 
+  select(unit_vars) %>%
+  rename_all(funs(stringr::str_replace_all(., c("shr_hu_"), ""))) %>%
+  rename_all(funs(stringr::str_replace_all(., c("_fp"), ""))) %>%
+  gather(subject, unit_share, "1fam_100":other_tract) %>%
+  separate(subject, c("unit", "universe")) %>%
+  mutate(unit = replace(unit, unit == "1fam", "Single-Family"),
+         unit = replace(unit, unit == "2to4fam", "2-4"),
+         unit = replace(unit, unit == "5to19fam", "5-19"),
+         unit = replace(unit, unit == "20up", "20+"),
+         unit = replace(unit, unit == "other", "Other"),
+         universe = replace(universe, universe == "tract", "Total"),
+         universe = replace(universe, universe == "100", "100-Year"),
+         universe = replace(universe, universe == "any", "Combined")) %>%
+  filter(unit_share != "NA")
+
+head(ny_floodzone_unit)
+```
+
+**Poverty**
+
+```{r}
+
+poverty_vars <- c("geo_type","geo_name","geo_id","stateusps","floodplain",
+                 "shr_pop_poverty_fp_100","shr_pop_poverty_fp_any","shr_pop_poverty_tract")
+
+ny_floodzone_poverty <- ny_floodzone %>% 
+  select(poverty_vars) %>%
+  rename_all(funs(stringr::str_replace_all(., c("shr_pop_poverty_"), ""))) %>%
+  rename_all(funs(stringr::str_replace_all(., c("fp_"), ""))) %>%
+  gather(subject, poverty_share, "100":tract) %>%
+  separate(subject, c("universe")) %>%
+  mutate(universe = replace(universe, universe == "tract", "Total"),
+         universe = replace(universe, universe == "100", "100-Year"),
+         universe = replace(universe, universe == "any", "Combined")) %>%
+  filter(poverty_share != "NA")
+
+head(ny_floodzone_poverty)
+```
+
+**Subsidized Housing**
+
+```{r}
+
+subsidized_vars <- c("geo_type","geo_name","geo_id","stateusps","floodplain",
+                 "ph_units_100year","ph_units_anyyear","sub_housing_units_100year","sub_housing_units_anyyear")
+
+ny_floodzone_subsidized <- ny_floodzone %>% 
+  select(subsidized_vars) %>%
+  rename_all(funs(stringr::str_replace_all(., c("housing_"), ""))) %>%
+  rename_all(funs(stringr::str_replace_all(., c("units_"), ""))) %>%
+  gather(subject, subsidized_units, ph_100year:sub_anyyear) %>%
+  separate(subject, c("subsidized", "universe")) %>%
+  mutate(subsidized = replace(subsidized, subsidized == "ph", "Public Housing"),
+         subsidized = replace(subsidized, subsidized == "sub", "Subsidized"),
+         universe = replace(universe, universe == "100year", "100-Year"),
+         universe = replace(universe, universe == "anyyear", "Combined")) %>%
+  filter(subsidized_units != "NA")
+
+head(ny_floodzone_subsidized)
+```
+
+**Building Age**
+
+```{r}
+
+years_vars <- c("geo_type","geo_name","geo_id","stateusps","floodplain",
+              "shr_hu_builtpre60_fp_100","shr_hu_builtpre60_fp_any","shr_hu_builtpre60_tract","shr_hu_built6079_fp_100",
+              "shr_hu_built6079_fp_any","shr_hu_built6079_tract","shr_hu_built8099_fp_100","shr_hu_built8099_fp_any",
+              "shr_hu_built8099_tract","shr_hu_built00s_fp_100","shr_hu_built00s_fp_any","shr_hu_built00s_tract")
+
+ny_floodzone_age <- ny_floodzone %>% 
+  select(years_vars) %>%
+  rename_all(funs(stringr::str_replace_all(., c("shr_hu_"), ""))) %>%
+  rename_all(funs(stringr::str_replace_all(., c("fp_"), ""))) %>%
+  gather(subject, age_share, builtpre60_100:built00s_tract) %>%
+  separate(subject, c("housing_age", "universe")) %>%
+  mutate(housing_age = replace(housing_age, housing_age == "builtpre60", "60+"),
+         housing_age = replace(housing_age, housing_age == "built6079", "41-60"),
+         housing_age = replace(housing_age, housing_age == "built8099", "21-40"),
+         housing_age = replace(housing_age, housing_age == "built00s", "<21"),
+         universe = replace(universe, universe == "tract", "Total"),
+         universe = replace(universe, universe == "100", "100-Year"),
+         universe = replace(universe, universe == "any", "Combined")) %>%
+  filter(age_share != "NA")
+
+head(ny_floodzone_age)
+```
+
+**Buildings 60+ Years**
+
+```{r}
+
+age_60_vars <- c("geo_type","geo_name","geo_id","stateusps","floodplain",
+              "shr_hu_pre60_fp_100_1fam","shr_hu_pre60_fp_any_1fam","shr_hu_pre60_fp_100_2to4fam","shr_hu_pre60_fp_any_2to4fam",
+              "shr_hu_pre60_fp_100_5to19fam","shr_hu_pre60_fp_any_5to19fam","shr_hu_pre60_fp_100_20up","shr_hu_pre60_fp_any_20up",
+              "shr_hu_pre60_fp_100_other","shr_hu_pre60_fp_any_other")
+
+ny_floodzone_60years <- ny_floodzone %>% 
+  select(age_60_vars) %>%
+  rename_all(funs(stringr::str_replace_all(., c("shr_hu_pre60_"), ""))) %>%
+  rename_all(funs(stringr::str_replace_all(., c("fp_"), ""))) %>%
+  gather(subject, age_60_share, "100_1fam":any_other) %>%
+  separate(subject, c("universe", "unit")) %>%
+  mutate(universe = replace(universe, universe == "tract", "Total"),
+         universe = replace(universe, universe == "100", "100-Year"),
+         universe = replace(universe, universe == "any", "Combined"),
+         unit = replace(unit, unit == "1fam", "Single-Family"),
+         unit = replace(unit, unit == "2to4fam", "2-4"),
+         unit = replace(unit, unit == "5to19fam", "5-19"),
+         unit = replace(unit, unit == "20up", "20+"),
+         unit = replace(unit, unit == "other", "Other")) %>%
+  filter(age_60_share != "NA")
+
+head(ny_floodzone_60years)
+```
+
+
+
+
+
+
+
+
