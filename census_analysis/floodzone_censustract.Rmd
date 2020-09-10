@@ -25,7 +25,8 @@ library(readxl)
 
 ```{r}
 # Import NY Floodzone Data
-ny_floodzone <- read_excel("~/Desktop/Thesis Analysis/Data/NY_FloodzoneData.xlsx", sheet = "Census Tract Data") 
+ny_floodzone <- read_excel("~/Desktop/Thesis Analysis/Data/NY_FloodzoneData.xlsx", 
+                           sheet = "Census Tract Data") 
 # Identify "500-Year" and "Combined" Floodplains
 ny_floodzone <- ny_floodzone %>%
   rename_all(. %>% tolower %>% gsub(" ", "_", .)) %>%
@@ -77,8 +78,10 @@ head(ny_floodzone_housing)
 
 race_vars <- c("geo_type","geo_name","geo_id","stateusps","floodplain",
                "shr_pop_asian_fp_100","shr_pop_asian_fp_any",
-               "shr_pop_asian_tract","shr_pop_black_fp_100","shr_pop_black_fp_any","shr_pop_black_tract",
-               "shr_pop_hispanic_fp_100","shr_pop_hispanic_fp_any","shr_pop_hispanic_tract","shr_pop_white_fp_100",
+               "shr_pop_asian_tract","shr_pop_black_fp_100",
+               "shr_pop_black_fp_any","shr_pop_black_tract",
+               "shr_pop_hispanic_fp_100","shr_pop_hispanic_fp_any",
+               "shr_pop_hispanic_tract","shr_pop_white_fp_100",
                "shr_pop_white_fp_any","shr_pop_white_tract")
 
 ny_floodzone_race <- ny_floodzone %>% 
@@ -101,9 +104,12 @@ head(ny_floodzone_race)
 ```{r}
 
 income_vars <- c("geo_type","geo_name","geo_id","stateusps","floodplain",
-                 "shr_hu_incless25_fp_100","shr_hu_incless25_fp_any","shr_hu_incless25_tract","shr_hu_inc25to50_fp_100",
-                 "shr_hu_inc25to50_fp_any","shr_hu_inc25to50_tract","shr_hu_inc50to75_fp_100","shr_hu_inc50to75_fp_any",
-                 "shr_hu_inc50to75_tract","shr_hu_inc75up_fp_100","shr_hu_inc75up_fp_any","shr_hu_inc75up_tract")
+                 "shr_hu_incless25_fp_100","shr_hu_incless25_fp_any",
+                 "shr_hu_incless25_tract","shr_hu_inc25to50_fp_100",
+                 "shr_hu_inc25to50_fp_any","shr_hu_inc25to50_tract",
+                 "shr_hu_inc50to75_fp_100","shr_hu_inc50to75_fp_any",
+                 "shr_hu_inc50to75_tract","shr_hu_inc75up_fp_100",
+                 "shr_hu_inc75up_fp_any","shr_hu_inc75up_tract")
 
 ny_floodzone_income <- ny_floodzone %>% 
   select(income_vars) %>%
@@ -128,7 +134,8 @@ head(ny_floodzone_income)
 ```{r}
 
 tenure_vars <- c("geo_type","geo_name","geo_id","stateusps","floodplain",
-                 "shr_hu_renter_fp_100","shr_hu_renter_fp_any","shr_hu_renter_tract","shr_hu_owner_fp_100",
+                 "shr_hu_renter_fp_100","shr_hu_renter_fp_any",
+                 "shr_hu_renter_tract","shr_hu_owner_fp_100",
                  "shr_hu_owner_fp_any","shr_hu_owner_tract")
 
 ny_floodzone_tenure <- ny_floodzone %>% 
@@ -151,10 +158,13 @@ head(ny_floodzone_tenure)
 ```{r}
 
 unit_vars <- c("geo_type","geo_name","geo_id","stateusps","floodplain",
-                 "shr_hu_1fam_fp_100","shr_hu_1fam_fp_any","shr_hu_1fam_tract","shr_hu_2to4fam_fp_100",
-                 "shr_hu_2to4fam_fp_any","shr_hu_2to4fam_tract","shr_hu_5to19fam_fp_100","shr_hu_5to19fam_fp_any",
-                 "shr_hu_5to19fam_tract","shr_hu_20up_fp_100","shr_hu_20up_fp_any","shr_hu_20up_tract",
-                 "shr_hu_other_fp_100","shr_hu_other_fp_any","shr_hu_other_tract")
+               "shr_hu_1fam_fp_100","shr_hu_1fam_fp_any",
+               "shr_hu_1fam_tract","shr_hu_2to4fam_fp_100",
+               "shr_hu_2to4fam_fp_any","shr_hu_2to4fam_tract",
+               "shr_hu_5to19fam_fp_100","shr_hu_5to19fam_fp_any",
+               "shr_hu_5to19fam_tract","shr_hu_20up_fp_100",
+               "shr_hu_20up_fp_any","shr_hu_20up_tract",
+               "shr_hu_other_fp_100","shr_hu_other_fp_any","shr_hu_other_tract")
 
 ny_floodzone_unit <- ny_floodzone %>% 
   select(unit_vars) %>%
@@ -180,7 +190,8 @@ head(ny_floodzone_unit)
 ```{r}
 
 poverty_vars <- c("geo_type","geo_name","geo_id","stateusps","floodplain",
-                 "shr_pop_poverty_fp_100","shr_pop_poverty_fp_any","shr_pop_poverty_tract")
+                 "shr_pop_poverty_fp_100","shr_pop_poverty_fp_any",
+                 "shr_pop_poverty_tract")
 
 ny_floodzone_poverty <- ny_floodzone %>% 
   select(poverty_vars) %>%
@@ -201,7 +212,8 @@ head(ny_floodzone_poverty)
 ```{r}
 
 subsidized_vars <- c("geo_type","geo_name","geo_id","stateusps","floodplain",
-                 "ph_units_100year","ph_units_anyyear","sub_housing_units_100year","sub_housing_units_anyyear")
+                     "ph_units_100year","ph_units_anyyear","sub_housing_units_100year",
+                     "sub_housing_units_anyyear")
 
 ny_floodzone_subsidized <- ny_floodzone %>% 
   select(subsidized_vars) %>%
@@ -223,9 +235,12 @@ head(ny_floodzone_subsidized)
 ```{r}
 
 years_vars <- c("geo_type","geo_name","geo_id","stateusps","floodplain",
-              "shr_hu_builtpre60_fp_100","shr_hu_builtpre60_fp_any","shr_hu_builtpre60_tract","shr_hu_built6079_fp_100",
-              "shr_hu_built6079_fp_any","shr_hu_built6079_tract","shr_hu_built8099_fp_100","shr_hu_built8099_fp_any",
-              "shr_hu_built8099_tract","shr_hu_built00s_fp_100","shr_hu_built00s_fp_any","shr_hu_built00s_tract")
+              "shr_hu_builtpre60_fp_100","shr_hu_builtpre60_fp_any",
+              "shr_hu_builtpre60_tract","shr_hu_built6079_fp_100",
+              "shr_hu_built6079_fp_any","shr_hu_built6079_tract",
+              "shr_hu_built8099_fp_100","shr_hu_built8099_fp_any",
+              "shr_hu_built8099_tract","shr_hu_built00s_fp_100",
+              "shr_hu_built00s_fp_any","shr_hu_built00s_tract")
 
 ny_floodzone_age <- ny_floodzone %>% 
   select(years_vars) %>%
@@ -250,8 +265,10 @@ head(ny_floodzone_age)
 ```{r}
 
 age_60_vars <- c("geo_type","geo_name","geo_id","stateusps","floodplain",
-              "shr_hu_pre60_fp_100_1fam","shr_hu_pre60_fp_any_1fam","shr_hu_pre60_fp_100_2to4fam","shr_hu_pre60_fp_any_2to4fam",
-              "shr_hu_pre60_fp_100_5to19fam","shr_hu_pre60_fp_any_5to19fam","shr_hu_pre60_fp_100_20up","shr_hu_pre60_fp_any_20up",
+              "shr_hu_pre60_fp_100_1fam","shr_hu_pre60_fp_any_1fam",
+              "shr_hu_pre60_fp_100_2to4fam","shr_hu_pre60_fp_any_2to4fam",
+              "shr_hu_pre60_fp_100_5to19fam","shr_hu_pre60_fp_any_5to19fam",
+              "shr_hu_pre60_fp_100_20up","shr_hu_pre60_fp_any_20up",
               "shr_hu_pre60_fp_100_other","shr_hu_pre60_fp_any_other")
 
 ny_floodzone_60years <- ny_floodzone %>% 
